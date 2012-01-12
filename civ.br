@@ -1,6 +1,10 @@
-{t A Developers Guide to Cities I've Visited}
+{title A Developers Guide to Cities I've Visited}
 
-{k Cities I've Visited} is a {k Facebook} IFrame application served from {k TripAdvisor.com}/MemberTravelMap. 
+{heading Overview}
+Cities I've Visited is a Facebook application. 
+
+{heading Architecture}
+CIV is served from Facebook as is served from TripAdvisor.com via the servlet MemberTravelMap.
 
 {k :name Cities I've Visited 
    :href http://apps.facebook.com/tripadvisortravelmap

@@ -11,3 +11,13 @@ FIXME: write
 Copyright (C) 2012 FIXME
 
 Distributed under the Eclipse Public License, the same as Clojure.
+
+bracey syntax:
+
+document            = { form | string };
+string              = all characters - '{' - '}' - ':' | '\:' | '\{' | '\}' , { all characters - '}' | '\}' }
+form                = '{', { white space }, { attribute }, [string], '}', { white space }
+attribute           = keyword, white space, value, [white space]
+keyword             = ':', { ? word characters ? }
+value =             = { ? word characters ? } | '"', all characters - '"', '"'
+white space         = ? white space characters ?

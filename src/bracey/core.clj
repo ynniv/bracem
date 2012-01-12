@@ -1,1 +1,2 @@
-(ns bracey.core)
+(ns bracey.core
+  (:use bracey.parse))
