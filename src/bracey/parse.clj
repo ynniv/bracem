@@ -21,17 +21,7 @@
 (def unescaped-char
   (p/except p/anything (p/alt escape-indicator string-delimiter)))
 
-(def zero-digit (nb-char-lit \0))
-(def nonzero-decimal-digit (p/lit-alt-seq "123456789" nb-char-lit))
-(def decimal-digit (p/alt zero-digit nonzero-decimal-digit))
-(def hexadecimal-digit (p/alt decimal-digit (p/lit-alt-seq "ABCDEF" nb-char-lit)))
-
-(def unicode-char-sequence
-  (p/complex [_ (nb-char-lit \u)
-              digits (p/factor= 4
-                       #_(failpoint hexadecimal-digit
-                         (expectation-error-fn "hexadecimal digit")))]
-    (-> digits #(apply str %) (Integer/parseInt 16) char)))
+(def apply-str #(apply str %))
 
 (def escaped-characters
   {\\ \\, \/ \/, \b \backspace, \f \formfeed, \n \newline, \r \return,
@@ -43,7 +33,7 @@
 
 (def escape-sequence
   (p/complex [_ escape-indicator
-             character (p/alt unicode-char-sequence
+             character (p/alt ;unicode-char-sequence
                               normal-escape-sequence)]
     character))
 
@@ -58,16 +48,48 @@
 
 ;; /sample json parser
 
+(def open-brace    (nb-char-lit \{))
+(def close-brace   (nb-char-lit \}))
+(def colon         (nb-char-lit \:))
+
 (def word-char     (comp nb-char (p/except p/anything
-                           (p/alt (p/lit \space) (p/lit \tab) (p/lit \") (p/lit \:)
-                                  (p/lit \() (p/lit \)) (p/lit \{) (p/lit \})))))
-(def word          (p/rep+ word-char))
-(def kw            (p/conc (nb-char-lit \:) word))
-(def value         (p/alt word (p/conc (nb-char-lit \") string-lit (nb-char-lit \"))))
-(def attribute     (p/conc kw ws value (p/opt ws)))
-(def form          (p/conc (nb-char-lit \{) (p/opt ws)
-                         word (p/opt ws)
-                         (p/rep* attribute) (p/opt ws)
-                         (p/opt string-lit) (p/opt ws)
-                         (nb-char-lit \})))
-(def document      (p/rep* (p/alt form (p/rep* string-char))))
+                                       (p/alt space tab line-break string-delimiter
+                                              open-brace close-brace))))
+
+(def nonkey-word   (p/semantics (p/conc (p/except word-char colon)
+                                        (p/rep* word-char))
+                                #(apply-str (apply cons %))))
+
+(def key-word      (p/semantics (p/conc (nb-char-lit \:) (p/rep* word-char))
+                                #(keyword (apply-str (second %)))))
+
+(def value         (p/alt nonkey-word
+                          string-lit))
+
+(def attribute     (p/complex [kw    key-word
+                               _     (p/opt ws)
+                               value value
+                               _     (p/opt ws)]
+                              (list kw value)))
+
+(declare run)
+(def form          (p/complex [_     open-brace
+                               _     (p/opt ws)
+                               word  (p/opt nonkey-word)
+                               _     (p/opt ws)
+                               attrs (p/rep* attribute)
+                               _     (p/opt ws)
+                               body  (p/rep* (p/alt form))
+                               _     (p/opt ws)
+                               _     close-brace
+                               ]
+                              (concat (list (symbol word)
+                                            (apply hash-map (apply concat attrs)))
+                                      body)
+                              ))
+
+(def run           (p/semantics (p/rep* (p/alt word-char
+                                               (p/constant-semantics ws \space)))
+                                apply-str))
+
+(def document      (p/rep* (p/alt form run)))
