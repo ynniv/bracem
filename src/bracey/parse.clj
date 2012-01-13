@@ -13,7 +13,7 @@
 (def newline-lit  (p/lit \newline))
 (def return-lit   (p/lit \return))
 (def line-break   (b-char (p/rep+ (p/alt newline-lit return-lit))))
-(def ws           (p/constant-semantics (p/rep* (p/alt space tab line-break)) :ws))
+(def ws           (p/constant-semantics (p/rep+ (p/alt space tab line-break)) :ws))
 
 (def escape-indicator (nb-char-lit \\))
 (def string-delimiter (nb-char-lit \"))
@@ -60,7 +60,8 @@
                                         (p/rep* word-char))
                                 #(apply-str (apply cons %))))
 
-(def key-word      (p/semantics (p/conc (nb-char-lit \:) (p/rep* word-char))
+(def key-word      (p/semantics (p/conc colon
+                                        (p/rep* word-char))
                                 #(keyword (apply-str (second %)))))
 
 (def value         (p/alt nonkey-word
@@ -79,17 +80,24 @@
                                _     (p/opt ws)
                                attrs (p/rep* attribute)
                                _     (p/opt ws)
-                               body  (p/rep* (p/alt form))
+                               body  (p/rep* (p/alt form run))
                                _     (p/opt ws)
                                _     close-brace
                                ]
-                              (concat (list (symbol word)
-                                            (apply hash-map (apply concat attrs)))
+                              (concat (list (if word (symbol word))
+                                            (apply concat attrs))
                                       body)
                               ))
 
-(def run           (p/semantics (p/rep* (p/alt word-char
-                                               (p/constant-semantics ws \space)))
+(def run-char      (comp nb-char (p/except p/anything
+                                           (p/alt open-brace close-brace))))
+
+(def run           (p/semantics (p/rep+ run-char)
                                 apply-str))
 
-(def document      (p/rep* (p/alt form run)))
+(def document      (p/rep* (p/alt (p/constant-semantics ws \space)
+                                  run
+                                  form)))
+
+(defn parse [text]
+  (first (document { :remainder (seq text) })))
