@@ -6,7 +6,7 @@ Cities I've Visited is a Facebook application.
 {heading Architecture}
 CIV is served from Facebook as is served from TripAdvisor.com via the servlet MemberTravelMap.
 
-{k :name Cities I've Visited 
+{k :name "Cities I've Visited"
    :href http://apps.facebook.com/tripadvisortravelmap
    :alias CIV
 }

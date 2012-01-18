@@ -12,8 +12,11 @@
 (def tab          (nb-char-lit \tab))
 (def newline-lit  (p/lit \newline))
 (def return-lit   (p/lit \return))
-(def line-break   (b-char (p/rep+ (p/alt newline-lit return-lit))))
-(def ws           (p/constant-semantics (p/rep+ (p/alt space tab line-break)) :ws))
+(def line-break   (b-char (p/alt newline-lit
+                                 return-lit
+                                 (p/conc return-lit newline-lit))))
+;(def ws           (p/constant-semantics (p/rep+ (p/alt space tab line-break)) :ws))
+(def ws           (p/rep+ (p/alt space tab line-break)))
 
 (def escape-indicator (nb-char-lit \\))
 (def string-delimiter (nb-char-lit \"))
@@ -44,13 +47,17 @@
   (p/complex [_ string-delimiter
               contents (p/rep* string-char)
               _ string-delimiter]
-             contents))
+             (apply-str contents)))
 
 ;; /sample json parser
 
 (def open-brace    (nb-char-lit \{))
 (def close-brace   (nb-char-lit \}))
 (def colon         (nb-char-lit \:))
+
+(def ws->keyword   (p/constant-semantics ws :ws))
+(def ws->space     (p/constant-semantics ws \space))
+(def ws->str       (p/semantics ws apply-str))
 
 (def word-char     (comp nb-char (p/except p/anything
                                        (p/alt space tab line-break string-delimiter
@@ -73,14 +80,14 @@
                                _     (p/opt ws)]
                               (list kw value)))
 
-(declare run)
+(declare body)
 (def form          (p/complex [_     open-brace
                                _     (p/opt ws)
                                word  (p/opt nonkey-word)
                                _     (p/opt ws)
                                attrs (p/rep* attribute)
                                _     (p/opt ws)
-                               body  (p/rep* (p/alt form run))
+                               body  body
                                _     (p/opt ws)
                                _     close-brace
                                ]
@@ -89,15 +96,21 @@
                                       body)
                               ))
 
+(def body (p/rep* (p/alt ws->keyword
+                         run
+                         form)))
+
 (def run-char      (comp nb-char (p/except p/anything
-                                           (p/alt open-brace close-brace))))
+                                           (p/alt open-brace close-brace space tab line-break))))
 
-(def run           (p/semantics (p/rep+ run-char)
-                                apply-str))
+(def run-word      (p/semantics (p/rep+ run-char) apply-str))
 
-(def document      (p/rep* (p/alt (p/constant-semantics ws \space)
-                                  run
-                                  form)))
+(def run           (p/complex
+                    [initial run-word
+                     middle  (p/rep* (p/conc ws->str run-word))]
+                    (apply str (apply concat (cons initial middle)))))
+
+(def document      (p/semantics (p/rep* body) #(cons 'document (apply concat %))))
 
 (defn parse [text]
   (first (document { :remainder (seq text) })))
