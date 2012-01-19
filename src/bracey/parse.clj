@@ -80,7 +80,21 @@
                                _     (p/opt ws)]
                               (list kw value)))
 
-(declare body)
+(def run-char      (comp nb-char (p/except p/anything
+                                           (p/alt open-brace close-brace space tab line-break))))
+
+(def run-word      (p/semantics (p/rep+ run-char) apply-str))
+
+(def run           (p/complex
+                    [initial run-word
+                     middle  (p/rep* (p/conc ws->str run-word))]
+                    (apply str (apply concat (cons initial middle)))))
+
+(declare form)
+(def body (p/rep* (p/alt ws->keyword
+                         run
+                         form)))
+
 (def form          (p/complex [_     open-brace
                                _     (p/opt ws)
                                word  (p/opt nonkey-word)
@@ -96,21 +110,7 @@
                                       body)
                               ))
 
-(def body (p/rep* (p/alt ws->keyword
-                         run
-                         form)))
-
-(def run-char      (comp nb-char (p/except p/anything
-                                           (p/alt open-brace close-brace space tab line-break))))
-
-(def run-word      (p/semantics (p/rep+ run-char) apply-str))
-
-(def run           (p/complex
-                    [initial run-word
-                     middle  (p/rep* (p/conc ws->str run-word))]
-                    (apply str (apply concat (cons initial middle)))))
-
-(def document      (p/semantics (p/rep* body) #(cons 'document (apply concat %))))
+(def document      (p/semantics body #(cons 'document (cons '() %))))
 
 (defn parse [text]
   (first (document { :remainder (seq text) })))
