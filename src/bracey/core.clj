@@ -2,7 +2,7 @@
   (:require bracey.parse))
 
 (defn render [x]
-  (str x))
+  (apply str x))
 
 (def forms {})
 

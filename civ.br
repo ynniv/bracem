@@ -1,10 +1,20 @@
 {title A Developers Guide to Cities I've Visited}
 
-{heading Overview}
-Cities I've Visited is a Facebook application. 
+{section :title Overview
+  Cities I've Visited is a Facebook application where members document cities that they have been to or plan on going to. They can additionally denote and optionally rate attractions, restaurants, and hotels that they have visited in cities that they have been to.
+}
 
-{heading Architecture}
-CIV is served from Facebook as is served from TripAdvisor.com via the servlet MemberTravelMap.
+{section :title Architecture
+  CIV is primarily accessed via {url http://apps.facebook.com/tripadvisortravelmap}. This Facebook page contains an IFrame that points to {url http://www.tripadvisor.com/MemberTravelMap?a=VIEW&view=fbCanvas}. 
+}
+
+{section :title Development
+  
+}
+
+{section :title Debugging
+
+}
 
 {k :name "Cities I've Visited"
    :href http://apps.facebook.com/tripadvisortravelmap
