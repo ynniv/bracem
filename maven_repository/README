@@ -1,3 +1,3 @@
 put things here with: 
 
-mvn install:install-file -Dfile=jpathwatch-0-95/jpathwatch-0-95.jar -DartifactId=jpathwatch -Dversion=0.95 -DgroupId=jpathwatch -Dpackaging=jar -DlocalRepositoryPath=maven_repository
+mvn deploy:deploy-file -DgroupId=jpathwatch -DartifactId=jpathwatch  -Dversion=0.95 -Dpackaging=jar -Dfile=jpathwatch-0-95/jpathwatch-0-95.jar -Durl=file:maven_repository
