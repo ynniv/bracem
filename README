@@ -1,18 +1,18 @@
 # bracey
 
-FIXME: write description
+Lispy markup syntax
 
 ## Usage
 
-FIXME: write
+lein run filename.br > filename.out
 
 ## License
 
-Copyright (C) 2012 FIXME
+Copyright (C) 2013 Vinny Fiano
 
 Distributed under the Eclipse Public License, the same as Clojure.
 
-bracey syntax:
+## Syntax
 
 document            = { form | string };
 string              = all characters - '{' - '}' - ':' | '\:' | '\{' | '\}' , { all characters - '}' | '\}' }
