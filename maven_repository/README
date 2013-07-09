@@ -1,3 +1,0 @@
-put things here with: 
-
-mvn deploy:deploy-file -DgroupId=jpathwatch -DartifactId=jpathwatch  -Dversion=0.95 -Dpackaging=jar -Dfile=jpathwatch-0-95/jpathwatch-0-95.jar -Durl=file:maven_repository
