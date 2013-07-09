@@ -3,11 +3,11 @@
 
 (def document (p/parser { :main [:ws? :body :ws?] }
  :body     #{ [:body :ws? :prose] [:body :ws? :form] :form :prose }
- :prose    #"[^:}{\s][^}{]*"
+ :prose    [#"([^:}{\s])" #"(\\[}{]|[^}{])*"]
  :form     ["{" :ws? :word :ws? :attr* :body? :ws? "}"]
  :attr     [:keyword :ws :word :ws]
  :keyword  [":" :word]
- :word     #{ [#"[^}{\s:\"]" #"[^}{\s\"]*"] ["\"" #"[^}{\s:]" #"[^\"]*" "\""] }
+ :word     #{ [#"[^\s:\"]" #"[^\s\"]*"] ["\"" #"[^\s:]" #"[^\"]*" "\""] }
  :ws       #"\s+"
  ))
 
@@ -22,11 +22,14 @@
 (defmethod normalize ::net.cgrand.parsley/unexpected [tree]
   [[:unexpected (first (:content tree))]])
 
+(defmethod normalize ::net.cgrand.parsley/unfinished [tree]
+  [[:unfinished (mapcat normalize (:content tree))]])
+
 (defmethod normalize :body [tree]
   (mapcat normalize (:content tree)))
 
 (defmethod normalize :prose [tree]
-  (list (collapse-whitespace (first (:content tree)))))
+  (list (collapse-whitespace (apply str (:content tree)))))
 
 (defmethod normalize :form [tree]
   (let [children (filter identity (mapcat normalize (:content tree)))
