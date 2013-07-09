@@ -29,7 +29,7 @@
   (mapcat normalize (:content tree)))
 
 (defmethod normalize :prose [tree]
-  (list (collapse-whitespace (apply str (:content tree)))))
+  (list (clojure.string/replace (apply str (:content tree)) #"\\([}{])" "$1")))
 
 (defmethod normalize :form [tree]
   (let [children (filter identity (mapcat normalize (:content tree)))
