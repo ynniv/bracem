@@ -1,10 +1,10 @@
-# bracey
+# bracem
 
 Lispy markup syntax
 
 ## Usage
 
-lein run filename.br > filename.out
+lein run filename.br [renderer] [transformer] > filename.out
 
 ## License
 
@@ -14,10 +14,10 @@ Distributed under the Eclipse Public License, the same as Clojure.
 
 ## Syntax
 
-document            = { form | string };
-string              = all characters - '{' - '}' - ':' | '\:' | '\{' | '\}' , { all characters - '}' | '\}' }
-form                = '{', { white space }, { attribute }, [string], '}', { white space }
-attribute           = keyword, white space, value, [white space]
-keyword             = ':', { ? word characters ? }
-value =             = { ? word characters ? } | '"', all characters - '"', '"'
-white space         = ? white space characters ?
+body     = body ws? prose | body ws? form | form | prose
+prose    = #"([^:}{\s])" #"(\\[}{]|[^}{])*"
+form     = "{" ws? word ws? attr* body? ws? "}"
+attr     = keyword ws word ws
+keyword  = ":" word
+word     = #"[^\s:\"]" #"[^\s\"]*" | "\"" #"[^\s:]" #"[^\"]*" "\""
+ws       = #"\s+"

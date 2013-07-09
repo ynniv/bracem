@@ -1,4 +1,4 @@
-(ns bracey.parse
+(ns bracem.parse
   (:require [net.cgrand.parsley :as p]))
 
 (def document (p/parser { :main [:ws? :body :ws?] }

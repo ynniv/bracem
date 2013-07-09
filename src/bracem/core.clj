@@ -1,6 +1,6 @@
-(ns bracey.core
+(ns bracem.core
   (:gen-class)
-  (:require [bracey.parse :as parse]))
+  (:require [bracem.parse :as parse]))
 
 (declare render-sgml)
 

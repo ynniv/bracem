@@ -1,5 +1,5 @@
-(ns bracey.test.core
-  (:use [bracey.core])
+(ns bracem.test.core
+  (:use [bracem.core])
   (:use [clojure.test]))
 
 (deftest replace-me ;; FIXME: write
