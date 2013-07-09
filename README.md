@@ -15,7 +15,11 @@ Distributed under the Eclipse Public License, the same as Clojure.
 ## Example
 
     { h1 bracem }
-    { p bracem is a markup language based on braces and keywords that looks a lot like lisp. The important rules are that \{ braces \} define forms, each form starts with a word, :keyword "value" pairs follow, and the body can contain a mixture of text and forms.}
+    { p bracem is a markup language based on braces and keywords 
+        that looks a lot like lisp. The important rules are that 
+        \{ braces \} define forms, each form starts with a word, 
+        :keyword "value" pairs follow, and the body can contain 
+        a mixture of text and forms.}
 
 ## Syntax
 
