@@ -1,5 +1,8 @@
 (ns bracey.core
+  (:gen-class)
   (:require [bracey.parse :as parse]))
+
+(declare render-sgml)
 
 (defn render-sgml-node [node]
   (if (string? node) node
@@ -16,7 +19,7 @@
 
 (def transformers { "default" (fn [tree] tree) })
 (def renderers    { "sgml"    render-sgml
-                    "default" (fn [tree] (with-out-str (pprint tree))) })
+                    "default" (fn [tree] (with-out-str (print tree))) })
 
 (defn process-stream [stream renderer transformer]
   (renderer (map transformer (parse/parse stream))))
@@ -27,4 +30,6 @@
                   (or (get transformers transformer) (get transformers "default"))))
 
 (defn -main [& args]
-  (print (apply do-main args)))
+  (if (> 1 (count args))
+    (println "usage: bracem filename [renderer] [transformer]")
+    (println (apply do-main args))))
