@@ -4,7 +4,22 @@ Lispy markup syntax
 
 ## Usage
 
-lein run filename.br [renderer] [transformer] > filename.out
+From source
+
+    lein run filename.br [renderer] > filename.out
+
+From jar
+
+    java -jar filename.br [renderer] > filename.out
+
+Current renderers
+
+    default (simple stringify)
+    sgml (names -> tags, attributes -> attributes, bodies -> children)
+
+HTML example
+
+    java -jar filename.br sgml > filename.html
 
 ## License
 
